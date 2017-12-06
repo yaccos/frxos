@@ -19,15 +19,15 @@ void dprintf(const char *format, ...);
  * 
  * Force a debug exception (exception #1)
 **/
-#define debug() asm("int $1")
+#define debug() asm("int $0x7E")
 
 /**
  * brk()
  * 
  * Force a breakpoint exception (exception #3)
 **/
-#define brk() asm("int $3")
+#define brk() 0 // asm("int $0x7F")
 
-void dump_fault_state(struct fault_frame *frame);
+void debug_dump_state(struct full_interrupt_frame *frame);
 
 #endif // DEBUG_H_

@@ -6,6 +6,8 @@
 
 #include "interrupt.h"
 
-void kb_init();
+void install_keyboard();
+
+extern void _isr_kb1();
 
 #endif // KB_H_

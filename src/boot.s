@@ -30,6 +30,9 @@
   .global _start
 
   _start:
+    # disable interrupts
+    cli
+
     # initialize stack
     movl $_stack_top, %esp
     movl %esp, %ebp
@@ -43,9 +46,8 @@
     # call static deconstructor
     call _fini
 
-    int $0x06
-
-  .global _halt
+  .global kernel_halt
+  kernel_halt:
   _halt:
     cli
     hlt

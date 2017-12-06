@@ -1,4 +1,6 @@
 # build output
 *.o
 *.elf
-.depend
+
+# depedency files
+*.d

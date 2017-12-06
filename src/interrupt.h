@@ -24,5 +24,6 @@ extern struct idt_pointer idt_ptr;
 
 void load_idt_entry(uint8_t num, uint32_t offset, uint16_t selector, uint8_t flags);
 void idt_init();
+void install_idt();
 
 #endif // INTERRUPT_H_

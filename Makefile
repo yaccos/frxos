@@ -8,42 +8,45 @@ ASMFLAGS := $(FLAGS)
 CFLAGS   := $(FLAGS) -std=gnu11
 CXXFLAGS := $(FLAGS) -std=gnu++11
 
-ASM_SRCS := $(wildcard src/*.s)
-C_SRCS   := $(wildcard src/*.c)
-CXX_SRCS := $(wildcard src/*.cc)
+ASM_SRCS := $(filter-out %.inc.s,$(wildcard src/*.s))
+C_SRCS   := $(filter-out %.inc.c,$(wildcard src/*.c))
+CXX_SRCS := $(filter-out %.inc.cc,$(wildcard src/*.cc))
 
 SRCS := $(ASM_SRCS) $(C_SRCS) $(CXX_SRCS)
-OBJS := $(patsubst src/%.s,%.o,$(ASM_SRCS)) $(patsubst src/%.c,%.o,$(C_SRCS)) $(patsubst src/%.cc,%.o,$(CXX_SRCS))
+OBJS := $(patsubst src/%.s,obj/%.o,$(ASM_SRCS)) $(patsubst src/%.c,obj/%.o,$(C_SRCS)) $(patsubst src/%.cc,obj/%.o,$(CXX_SRCS))
 
-CRTI_OBJ:=crti.o
+CRTI_OBJ:=obj/crti.o
 CRTBEGIN_OBJ:=$(shell ${CC} $(CFLAGS) -print-file-name=crtbegin.o)
 CRTEND_OBJ:=$(shell ${CC} $(CFLAGS) -print-file-name=crtend.o)
-CRTN_OBJ:=crtn.o
+CRTN_OBJ:=obj/crtn.o
 
 OBJ_LINK_LIST:=$(CRTI_OBJ) $(CRTBEGIN_OBJ) $(filter-out ${CRTI_OBJ} ${CRTN_OBJ},$(OBJS)) $(CRTEND_OBJ) $(CRTN_OBJ)
 
-.PHONY: all clean depend
+.PHONY: all clean
 
-all: frxos.elf depend
+all: frxos.elf
+
+print:
+	@echo "ASM_SRCS=" $(ASM_SRCS)
+	@echo "C_SRCS=  " $(C_SRCS)
+	@echo "CXX_SRCS=" $(CXX_SRCS)
 
 clean:
-	@rm -f frxos.elf $(OBJS) .depend
+	@rm -f frxos.elf $(OBJS) $(wildcard src/*.d)
 
-depend: .depend
-.depend: $(SRCS)
-	@rm -f ./.depend
-	@$(CC) $(CFLAGS) -MM $^ -MF  ./.depend;
--include .depend
-
-frxos.elf: depend linker.ld $(OBJ_LINK_LIST)
+frxos.elf: linker.ld $(OBJ_LINK_LIST)
 	$(CC) -ffreestanding -nostdlib -T linker.ld $(OBJ_LINK_LIST) -o $@ -lgcc
 
-%.o: src/%.s
-	${CC} -ffreestanding ${CFLAGS} -c $< -o $@
+obj/%.o: src/%.s
+	@mkdir -p obj
+	${CC} -ffreestanding ${CFLAGS} -MMD -MF $(patsubst %.s,%.d,$<) -c $< -o $@
 
-%.o: src/%.c
-	${CC} -ffreestanding ${CFLAGS} -c $< -o $@
+obj/%.o: src/%.c
+	@mkdir -p obj
+	${CC} -ffreestanding ${CFLAGS} -MMD -MF $(patsubst %.c,%.d,$<) -c $< -o $@
 
-%.o: src/%.cc
-	${CXX} -ffreestanding ${CFLAGS} -c $< -o $@
+obj/%.o: src/%.cc
+	@mkdir -p obj
+	${CXX} -ffreestanding ${CFLAGS} -MMD -MF $(patsubst %.cc,%.d,$<) -c $< -o $@
 
+-include src/*.d

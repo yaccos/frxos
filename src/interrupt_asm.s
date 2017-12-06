@@ -1,3 +1,5 @@
+.include "src/pushxl.inc.s"
+
 // exceptions
 .section .text
   .global _isr0
@@ -34,10 +36,10 @@
   .global _isr31
 
   .extern kernel_fault_handler
-  .extern _halt
+  .extern kernel_halt
   _isr_exception_stub:
-    pushal // push all registers
-    addl $20, 12(%esp) // set stored ESP to ESP at interrupt
+    pushxl // push all registers
+    addl $20, 32(%esp) // set stored ESP to ESP at interrupt
 
     // push pointer to stack
     movl %esp, %eax
@@ -50,11 +52,11 @@
     // if kernel_fault_handler() returned non-zero, then 
     // halt
     cmp $0, %eax
-    jne _halt
+    jne kernel_halt
 
     // clear stack
-    popl %eax
-    popal
+    addl $4, %esp
+    popxl
     addl $8, %esp
 
     // return from interrupt

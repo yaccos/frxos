@@ -3,45 +3,44 @@
 
 #include "types.h"
 #include "debug.h"
+#include "io.h"
 #include "interrupt.h"
+#include "irq.h"
+#include "timer.h"
 #include "kb.h"
 
-// register const void *const esp asm("esp");
-// register const void *const ebp asm("ebp");
+__attribute__((noreturn)) extern void kernel_halt();
+__attribute__((noreturn)) extern void kernel_reboot();
 
-void foo();
+static inline void install_gdt() { /* TODO: implement in gdt.c */ }
 
-void kernel_main() {  
-  // initialize interrupt table
-  idt_init();
-  
-  // initialize keyboard
-  kb_init();
+void kernel_main() {
+  install_gdt();
+  install_idt();
+  install_irq();
+  install_timer();
+  install_keyboard();
+
+  // enable interrupts
+  asm volatile("sti");
 
   debug();
-  foo();
-  debug();
+
+  // event loop (wait for interrupts)
+  for(;;)
+    asm("hlt");
 }
 
 static const char *const error_messages[32];
 
-int kernel_fault_handler(struct fault_frame *info) {
-  if(info->int_no < 0 || info->int_no >= 32) {
+int kernel_fault_handler(struct full_interrupt_frame *info) {
+  if(info->num < 0 || info->num >= 32) {
     return 0;
   }
-
-  if(info->int_no == 1) {
-    // debug...
-    dump_fault_state(info);
-    return 0;
-  } else if(info->int_no == 3) {
-    // breakpoint
-    return 0;
-  }
-   
+  
   dprintf("== EXCEPTION OCCURRED ==\n");
-  dprintf("Exception %d: %s (%d)\n", info->int_no, error_messages[info->int_no], info->err_code);
-  dump_fault_state(info);
+  dprintf("Exception %d: %s (%d)\n", info->num, error_messages[info->num], info->err_code);
+  debug_dump_state(info);
   return 1;
 }
 

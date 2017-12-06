@@ -21,7 +21,15 @@ void idt_init() {
   idt_ptr.limit = (sizeof(struct idt_entry) * IDT_SIZE) - 1;
   idt_ptr.base  = (uint32_t)&idt;
   asm("lidt %0" :: "m"(idt_ptr));
+}
 
+void install_idt() {
+  idt_init();
+
+  // install debug interrupt (0x7E)
+  extern void debug_int_handler();
+  load_idt_entry(0x7E, (uint32_t)&debug_int_handler, 0x08, 0x8E);
+  
   // install default exception handlers
   extern void _isr0();
   extern void _isr1();
