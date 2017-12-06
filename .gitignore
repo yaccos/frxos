@@ -4,3 +4,6 @@
 
 # depedency files
 *.d
+
+# editor settings
+.vscode/

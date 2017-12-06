@@ -5,29 +5,17 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#include "types.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/**
- * dprintf(format, ...)
- * 
- *  Print to message standard debugging output.
-**/
 void dprintf(const char *format, ...);
 
-/**
- * debug()
- * 
- * Force a debug exception (exception #1)
-**/
-#define debug() asm("int $0x7E")
+#define debug() asm("int $0x7E");
+#define brk()   asm("int $0x7F");
 
-/**
- * brk()
- * 
- * Force a breakpoint exception (exception #3)
-**/
-#define brk() 0 // asm("int $0x7F")
-
-void debug_dump_state(struct full_interrupt_frame *frame);
+#ifdef __cplusplus
+}
+#endif
 
 #endif // DEBUG_H_

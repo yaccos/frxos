@@ -1,80 +1,40 @@
+#include "kernel.h"
+
 #include <stddef.h>
 #include <stdint.h>
 
-#include "types.h"
 #include "debug.h"
-#include "io.h"
-#include "interrupt.h"
+
+#include "gdt.h"
+#include "idt.h"
 #include "irq.h"
+#include "serial.h"
 #include "timer.h"
-#include "kb.h"
+#include "keyboard.h"
 
-__attribute__((noreturn)) extern void kernel_halt();
-__attribute__((noreturn)) extern void kernel_reboot();
-
-static inline void install_gdt() { /* TODO: implement in gdt.c */ }
-
-void kernel_main() {
+/**
+ * Call kernel initialization code
+**/
+void kernel_init() {
   install_gdt();
   install_idt();
   install_irq();
+
+  install_serial(COM1);
   install_timer();
   install_keyboard();
-
-  // enable interrupts
-  asm volatile("sti");
-
-  debug();
-
-  // event loop (wait for interrupts)
-  for(;;)
-    asm("hlt");
 }
 
-static const char *const error_messages[32];
-
-int kernel_fault_handler(struct full_interrupt_frame *info) {
-  if(info->num < 0 || info->num >= 32) {
-    return 0;
-  }
-  
-  dprintf("== EXCEPTION OCCURRED ==\n");
-  dprintf("Exception %d: %s (%d)\n", info->num, error_messages[info->num], info->err_code);
-  debug_dump_state(info);
-  return 1;
+/**
+ * Main code for kernel
+**/
+void kernel_main() {
+  wait_forever();
 }
 
-static const char *const error_messages[32] = {
-  "Division By Zero",
-  "Debug",
-  "Non Maskable Interrupt",
-  "Breakpoint",
-  "Into Detected Overflow",
-  "Out of Bounds",
-  "Invalid Opcode",
-  "No Coprocessor",
-  "Double Fault",
-  "Coprocessor Segment Overrun",
-  "Bad TSS",
-  "Segment Not Present",
-  "Stack Fault",
-  "General Protection Fault",
-  "Page Fault",
-  "Unknown Interrupt",
-  "Coprocessor Fault",
-  "Alignment Check",
-  "Machine Check",
-  "Reserved",
-  "Reserved",
-  "Reserved",
-  "Reserved",
-  "Reserved",
-  "Reserved",
-  "Reserved",
-  "Reserved",
-  "Reserved",
-  "Reserved",
-  "Reserved",
-  "Reserved",
-  "Reserved",
-};
+/**
+ * Call kernel finalization code (after clean exit from kernel_main())
+**/
+void kernel_fini() {
+  dprintf("==== DONE ====\n");
+}
