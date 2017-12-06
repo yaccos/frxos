@@ -12,7 +12,7 @@ extern "C" {
 
 void install_timer();
 void set_timer_divider(uint16_t divider);
-uint64_t get_timer_ticks();
+uint64_t clock();
 
 // sleep CPU for a while
 void sleep(uint64_t sec);   // sleep for a whole number of seconds

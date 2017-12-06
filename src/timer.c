@@ -36,7 +36,7 @@ void set_timer_divider(uint16_t divider) {
   outb(TIMER_CH0, (divider >> 8) & 0xFF);
 }
 
-uint64_t get_timer_ticks() {
+uint64_t clock() {
   return clock_ticks;
 }
 
