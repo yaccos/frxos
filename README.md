@@ -6,10 +6,10 @@
 
 * [x] Serial input/output
 * [x] Easy debugging
-  * [ ] Press <kbd>Break</kbd> to show current state (registers, stack, stack trace, disassembly etc.)
-* [ ] Memory management
+  * [x] Press <kbd>Pause</kbd> to show current state (registers, stack, stack trace, disassembly etc.)
 * [ ] Keyboard input
 * [ ] Display output
+* [ ] Memory management
 * [ ] Basic shell
 * [ ] Hard drive access
 * [ ] User-space programs
