@@ -31,10 +31,8 @@ void kernel_init() {
  * Main code for kernel
 **/
 void kernel_main() {
-  vga_printf(0, 0, 0xF000, "Hello, %s!\nHello, %s!", "World", "Diamond");
-  for(;;) {
-    vga_printf(4, 0, 0x0900, "  %u           ", (uint32_t)(clock() / TICKS_PER_SEC));
-  }
+  debug();
+  wait_forever();
 }
 
 /**

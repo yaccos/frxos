@@ -1,5 +1,12 @@
 .extern irq_common_handler
 
+.section .data
+  .global __irq_return_ptr
+
+    .align 4
+  __irq_return_ptr: # pointer to function to call after IRQ returns
+    .long 0
+
 .section .text
   _irq_common_stub:
     // push all general-purpose and segment registers (except CS)
@@ -14,6 +21,9 @@
     movl %esp, %eax
     pushl %eax
 
+    // reset __irq_return_ptr
+    movl $0, __irq_return_ptr
+
     // call IRQ handler
     call irq_common_handler
 
@@ -27,7 +37,14 @@
     popal
     addl $8, %esp
 
+    // if __irq_return_ptr is non-zero, call function before returning from interrupt
+    movl __irq_return_ptr, %eax
+    cmp $0, %eax
+    jz __irq_common_stub__end
+    call *%eax
+
     // return from interrupt
+  __irq_common_stub__end:
     iret
 
   _irq0:

@@ -8,9 +8,6 @@
 #include "mini-printf.h"
 
 volatile uint16_t *vga_buffer = (uint16_t*)0xB8000;
-uint16_t VGA_COLS = 80;
-uint16_t VGA_ROWS = 25;
-#define VGA_SIZE ((uint16_t)(VGA_COLS * VGA_ROWS))
 
 #define VGA_POS(row, col) ((uint16_t)(row) * VGA_COLS + (uint16_t)(col))
 

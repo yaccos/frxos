@@ -10,6 +10,8 @@ extern "C" {
 
 void install_keyboard();
 
+uint16_t last_key_pressed();
+
 #ifdef __cplusplus
 }
 #endif

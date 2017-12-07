@@ -55,6 +55,11 @@ void set_irq_handler(uint8_t num, void (*func)(struct full_interrupt_frame*)) {
     irq_handlers[num] = func;
 }
 
+void set_irq_return(void(*func)(struct full_interrupt_frame*)) {
+  extern void (*__irq_return_ptr)(struct full_interrupt_frame*);
+  __irq_return_ptr = func;
+}
+
 void install_irq() {
   irq_remap(PIC1_PORT, PIC2_PORT);
 

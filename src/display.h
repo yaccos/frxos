@@ -11,9 +11,9 @@ extern "C" {
 
 void install_display();
 
-uint16_t get_vga_cols();
-uint16_t get_vga_rows();
-uint16_t get_vga_size();
+#define VGA_COLS 80
+#define VGA_ROWS 25
+#define VGA_SIZE (VGA_COLS * VGA_ROWS)
 
 void vga_fill(uint16_t ch);
 static inline void vga_reset() { vga_fill(0); }

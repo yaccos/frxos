@@ -16,6 +16,7 @@ extern "C" {
 void install_irq();
 
 void set_irq_handler(uint8_t num, void (*func)(struct full_interrupt_frame*));
+void set_irq_return(void(*func)(struct full_interrupt_frame*));
 
 uint16_t pic_get_irr();
 uint16_t pic_get_isr();

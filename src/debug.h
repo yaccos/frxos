@@ -14,7 +14,6 @@ extern "C" {
 void dprintf(const char *format, ...);
 
 #define debug() asm("int $0x7E");
-#define brk()   asm("int $0x7F");
 
 extern void enter_debug_mode(struct full_interrupt_frame *frame);
 

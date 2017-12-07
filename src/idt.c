@@ -59,6 +59,9 @@ void install_idt() {
   load_idt_func(29, _isr29);
   load_idt_func(30, _isr30);
   load_idt_func(31, _isr31);
+
+  // toggle debug screen
+  load_idt_func(126, _isr126);
 }
 
 void load_idt_entry(uint8_t num, void(*func)(), uint16_t selector, uint8_t flags) {

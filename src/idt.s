@@ -32,6 +32,29 @@
     jmp kernel_halt
     iret
 
+  # ISR 126: toggle debug screen
+  _isr126:
+    pushl $0
+    pushl $126
+    pushal                // push all general-purpose and segment registers (except CS)
+    pushl %ss
+    pushl %ds
+    pushl %es
+    pushl %fs
+    pushl %gs
+    movl %esp, %eax       // push pointer to stack
+    pushl %eax
+    call enter_debug_mode // enter debug mode
+    addl $4, %esp         // clear stack frame
+    popl %gs
+    popl %fs
+    popl %es
+    popl %ds
+    popl %ss
+    popal
+    addl $8, %esp
+    iret                  // return from interrupt
+
   _isr0:
     pushl $0
     pushl $0
@@ -224,3 +247,4 @@
   .global _isr29
   .global _isr30
   .global _isr31
+  .global _isr126

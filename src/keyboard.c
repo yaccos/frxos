@@ -42,14 +42,12 @@ static void key_handler(struct full_interrupt_frame *frame) {
   if(scancode == 0x1D45) {
     // if Pause/Brk is pressed, then enter debug mode
     if(pressed) {
-      dprintf("______ 0x%08x\n", frame);
-      enter_debug_mode(frame);
-      dprintf("^^^^^^\n", frame);
+      set_irq_return(&enter_debug_mode);
     }
     return;
   }
 
-  dprintf("Unhandled key: %04X %s\n", scancode, (pressed ? "DOWN" : "UP"));
+  // dprintf("Unhandled key: %04X %s\n", scancode, (pressed ? "DOWN" : "UP"));
 }
 
 void install_keyboard() {
