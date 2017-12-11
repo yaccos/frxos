@@ -4,11 +4,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "attr.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern void kernel_halt();
+__fastcall
+extern void kernel_halt(const char *message);
 
 #ifdef __cplusplus
 }

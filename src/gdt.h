@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-static inline void install_gdt() { }
+void install_gdt();
 
 #ifdef __cplusplus
 }

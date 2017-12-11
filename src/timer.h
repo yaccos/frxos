@@ -19,16 +19,13 @@ void sleep(uint64_t sec);   // sleep for a whole number of seconds
 void usleep(uint64_t usec); // sleep for a whole number of microseconds
 
 // short CPU sleep
-#define wait() do { asm volatile("hlt"); } while(0)
+#define wait() ({ asm volatile("hlt"); 0; })
 
 // CPU sleep forever
-#define wait_forever() do { asm volatile("hlt"); } while(1)
-
-// CPU sleep while condition is true
-#define wait_while(cond) do { asm volatile("hlt"); } while(cond)
+#define wait_forever() ({ for(;;) { asm volatile("hlt")); }; 1; })
 
 // CPU sleep until condition is true
-#define wait_until(cond) do { asm volatile("hlt"); } while(!(cond))
+#define wait_for(expr) ({ typeof(expr) __expr; while(!(__expr = expr)) { asm volatile("hlt"); }; __expr; })
 
 #ifdef __cplusplus
 }

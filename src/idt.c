@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "attr.h"
 #include "debug.h"
 
 struct idt_entry {
@@ -11,16 +12,17 @@ struct idt_entry {
   uint8_t  zero;
   uint8_t  flags;
   uint16_t offset_hi;
-} __attribute__((packed));
+} __packed;
 
 struct idt_pointer {
   uint16_t limit;
   struct idt_entry *base;
-} __attribute__((packed));
+} __packed;
 
 static struct idt_entry idt[IDT_SIZE] = { 0 };
 static struct idt_pointer idt_ptr;
-static const char *const exception_messages[32];
+
+extern const char *const exception_messages[32];
 
 void install_idt() {
   idt_ptr.limit = (sizeof(struct idt_entry) * IDT_SIZE) - 1;
@@ -74,7 +76,7 @@ void load_idt_entry(uint8_t num, void(*func)(), uint16_t selector, uint8_t flags
   idt[num].zero = 0;
 }
 
-__attribute__((cold))
+__cold
 int fault_handler(struct full_interrupt_frame *frame) {
   if(frame->no < 32 && exception_messages[frame->no]) {
     dprintf("Exception %d: %s (%d)\n", frame->no, exception_messages[frame->no], frame->err_code);
@@ -85,6 +87,6 @@ int fault_handler(struct full_interrupt_frame *frame) {
   return 0;
 }
 
-static const char *const exception_messages[32] = {
+const char *const exception_messages[32] = {
   0,
 };

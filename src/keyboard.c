@@ -12,7 +12,7 @@
 #define PS2_PORT 0x60
 
 static void key_handler(struct full_interrupt_frame *frame) {
-  uint16_t scancode = inb(PS2_PORT);
+  uint8_t scancode = inb(PS2_PORT);
   bool pressed = (scancode & 0x80) == 0;
 
   // resolve extended scancodes (beginning with 0xE0 or 0xE1)

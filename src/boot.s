@@ -39,20 +39,37 @@
     movl $__stack_top, %esp
     movl %esp, %ebp
 
-    # call initializers
-    call _init
+    # push to stack:
+    pushl %ebx     # pointer to multiboot information struct
+    pushl %eax     # multiboot magic word
+
+    # call C constructors
+    #call _init
+
+    # call kernel initializer
     call kernel_init
 
     # call kernel main()
     sti
     call kernel_main
     cli
-    
-    # call finalizers
-    call kernel_fini
-    call _fini
-  
-  kernel_halt:
-    cli
-    hlt
+
+    # cleanup / halt kernel
+    movl $0, %ecx
     jmp kernel_halt
+  # ** end of __start **
+
+
+    # ECX gives pointer to exit message (may be null)
+  kernel_halt:
+    # call kernel finalizer
+    call kernel_fini
+
+    # call C destructors
+    #call _fini
+
+  __kernel_halt_loop:
+    # enter infinite loop
+    cli                     # disable hardware interrupts
+    hlt                     # wait for interrupts
+    jmp __kernel_halt_loop  # if interrupt

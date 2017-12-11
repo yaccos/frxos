@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "attr.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,7 +34,7 @@ void install_idt();
 void load_idt_entry(uint8_t num, void (*func)(), uint16_t selector, uint8_t flags);
 #define load_idt_func(num, name) \
   do { \
-    extern void name(); \
+      extern void name(); \
     load_idt_entry(num, &name, 0x08, 0x8E); \
   } while(0)
 

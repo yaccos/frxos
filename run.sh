@@ -1,2 +1,3 @@
 #!/bin/bash
-qemu-system-i386 -kernel "$(dirname "${BASH_SOURCE[0]}")/frxos.elf" -serial mon:stdio "$@"
+set -x
+qemu-system-i386 -cdrom "$(dirname "${BASH_SOURCE[0]}")/frxos.iso" -serial mon:stdio "$@"

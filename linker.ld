@@ -7,6 +7,7 @@ SECTIONS
 	/* Begin putting sections at 1 Megabyte (1M), a good place for kernels to be loaded at by the bootloader. */
 	/* This is because memory below 1 Megabyte is reserved for other x86-related things, so we can't use it */
 	. = 1M;
+	__kernel_start = .;
  
 	/* We align all sections in the executable at multiples of 4 Kilobytes (4K). This will become useful later in development when we add paging */
  
@@ -41,4 +42,6 @@ SECTIONS
 		*(COMMON)
 		*(.bss)
 	}
+
+	__kernel_end = .;
 }

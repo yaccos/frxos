@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#include "mini-printf.h"
+#include "printf.h"
 #include "serial.h"
 #include "timer.h"
 #include "idt.h"
@@ -20,7 +20,7 @@ void dprintf(const char *format, ...) {
   va_list args;
   va_start(args, format);
   
-  int len = mini_vsnprintf(debug_buffer, DEBUG_BUFFER_SIZE, format, args);
+  int len = vsnprintf(debug_buffer, DEBUG_BUFFER_SIZE, format, args);
   
   if(len > 0) {
     serial_write(DEBUG_PORT, debug_buffer, len);
@@ -50,7 +50,7 @@ void __debug_mode(struct full_interrupt_frame *frame) {
 
   // draw debug info on screen
   {
-    extern const void __stack_top, __stack_bottom;
+    extern const char __stack_top, __stack_bottom;
 
     vga_printf(0,  0,   COLOR, "Debug Mode");
 
@@ -97,9 +97,9 @@ void __debug_mode(struct full_interrupt_frame *frame) {
     vga_printf(0, 44, COLOR, "Stack:");
     {
 
-      const void *ebp = (const void*)frame->ebp;
-      const void *esp = (const void*)frame->esp;
-      const void *ptr = esp - (uint32_t)esp % 16;
+      const char *ebp = (const char*)frame->ebp;
+      const char *esp = (const char*)frame->esp;
+      const char *ptr = esp - (uint32_t)esp % 16;
 
       uint32_t max_stack_lines = VGA_ROWS - 2;
       int i;
@@ -109,7 +109,7 @@ void __debug_mode(struct full_interrupt_frame *frame) {
         for(int j = 0; j < 8; j++) {
           if(ptr == ebp) {
             esp = ebp;
-            ebp = ((void**)ebp)[0];
+            ebp = ((const char**)ebp)[0];
           }    
 
           if(esp == ptr + j)
@@ -126,9 +126,9 @@ void __debug_mode(struct full_interrupt_frame *frame) {
     // stack trace
     vga_printf(14, 0, COLOR, "Stack trace:");
     {
-      const void *eip = (const void*)frame->eip;
-      const void *esp = (const void*)frame->esp;
-      const void *ebp = (const void*)frame->ebp;
+      const char *eip = (const char*)frame->eip;
+      const char *esp = (const char*)frame->esp;
+      const char *ebp = (const char*)frame->ebp;
   
       uint32_t max_stack_lines = (VGA_ROWS - 16);
       int i;
@@ -137,8 +137,8 @@ void __debug_mode(struct full_interrupt_frame *frame) {
         vga_printf(16 + i, 4, COLOR, "stack frame: %08X - %08X", esp, ebp);
 
         esp = ebp;
-        ebp = ((void**)esp)[0];
-        eip = ((void**)esp)[1];
+        ebp = ((const char**)esp)[0];
+        eip = ((const char**)esp)[1];
       }
       if(i < max_stack_lines) {
         vga_printf(15 + i, 15, WEAK_COLOR, "< end >");
@@ -156,7 +156,7 @@ void __debug_mode(struct full_interrupt_frame *frame) {
   
   }
   
-  wait_until(leave_debug_mode);
+  wait_for(leave_debug_mode);
 
   vga_writeb(0, 0, vga_tmp_buffer, VGA_SIZE);
 

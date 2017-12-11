@@ -1,5 +1,5 @@
-#ifndef KEYBOARD_H_
-#define KEYBOARD_H_
+#ifndef SHELL_H_
+#define SHELL_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -8,10 +8,10 @@
 extern "C" {
 #endif
 
-void install_keyboard();
+void shell();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // KEYBOARD_H_
+#endif // SHELL_H_

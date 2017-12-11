@@ -1,6 +1,9 @@
 # build output
 *.o
 *.elf
+*.iso
+/out/
+/isodir/
 
 # depedency files
 *.d

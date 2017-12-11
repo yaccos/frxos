@@ -24,7 +24,7 @@ OBJ_LINK_LIST:=$(CRTI_OBJ) $(CRTBEGIN_OBJ) $(filter-out ${CRTI_OBJ} ${CRTN_OBJ},
 
 .PHONY: all clean
 
-all: frxos.elf
+all: frxos.iso
 
 print:
 	@echo "ASM_SRCS=" $(ASM_SRCS)
@@ -32,8 +32,14 @@ print:
 	@echo "CXX_SRCS=" $(CXX_SRCS)
 
 clean:
-	@rm -f frxos.elf $(OBJS) $(wildcard out/*.d)
-	@rmdir --ignore-fail-on-non-empty obj
+	@rm -f frxos.elf $(OBJS) $(wildcard obj/*.d)
+	@rm -rf obj isodir
+
+frxos.iso: frxos.elf grub.cfg
+	mkdir -p isodir/boot/grub
+	cp frxos.elf isodir/boot/
+	cp grub.cfg isodir/boot/grub/
+	grub-mkrescue -o $@ isodir
 
 frxos.elf: linker.ld $(OBJ_LINK_LIST)
 	$(CC) -ffreestanding -nostdlib -T linker.ld $(OBJ_LINK_LIST) -o $@ -lgcc
@@ -48,6 +54,6 @@ obj/%.o: src/%.c
 
 obj/%.o: src/%.cc
 	@mkdir -p obj
-	${CXX} -ffreestanding ${CFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
+	${CXX} -ffreestanding ${CXXFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
 
 -include obj/*.d

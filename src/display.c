@@ -5,7 +5,7 @@
 
 #include "debug.h"
 #include "io.h"
-#include "mini-printf.h"
+#include "printf.h"
 
 volatile uint16_t *vga_buffer = (uint16_t*)0xB8000;
 
@@ -87,7 +87,7 @@ void vga_printf(uint8_t row, uint8_t col, uint16_t color, const char *format, ..
   va_list args;
   va_start(args, format);
   
-  int len = mini_vsnprintf(buffer, TMP_BUFFER_SIZE, format, args);
+  int len = vsnprintf(buffer, TMP_BUFFER_SIZE, format, args);
 
   if(len > 0) {
     vga_write(row, col, color, buffer, len);
