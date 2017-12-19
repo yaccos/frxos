@@ -3,22 +3,22 @@ TARGET = i686-elf
 CC  := ${TARGET}-gcc
 CXX := ${TARGET}-g++
 
-FLAGS    := -g -O3 -fno-omit-frame-pointer
+FLAGS    := -g -O0 -fno-omit-frame-pointer -Ilib/
 ASMFLAGS := $(FLAGS)
-CFLAGS   := $(FLAGS) -std=gnu11
-CXXFLAGS := $(FLAGS) -std=gnu++11
+CFLAGS   := $(FLAGS) -std=gnu11 -include src/prefix.h
+CXXFLAGS := $(FLAGS) -std=gnu++11 -include src/prefix.h -fno-exceptions -fno-rtti
 
-ASM_SRCS := $(wildcard src/*.s)
-C_SRCS   := $(wildcard src/*.c)
-CXX_SRCS := $(wildcard src/*.cc)
+ASM_SRCS := $(wildcard src/*.s src/**/*.s)
+C_SRCS   := $(wildcard src/*.c src/**/*.c)
+CXX_SRCS := $(wildcard src/*.cc src/**/*.cc)
 
 SRCS := $(ASM_SRCS) $(C_SRCS) $(CXX_SRCS)
 OBJS := $(patsubst src/%.s,obj/%.asm.o,$(ASM_SRCS)) $(patsubst src/%.c,obj/%.o,$(C_SRCS)) $(patsubst src/%.cc,obj/%.o,$(CXX_SRCS))
 
-CRTI_OBJ:=obj/crti.asm.o
+CRTI_OBJ:=obj/sys/crti.asm.o
 CRTBEGIN_OBJ:=$(shell ${CC} $(CFLAGS) -print-file-name=crtbegin.o)
 CRTEND_OBJ:=$(shell ${CC} $(CFLAGS) -print-file-name=crtend.o)
-CRTN_OBJ:=obj/crtn.asm.o
+CRTN_OBJ:=obj/sys/crtn.asm.o
 
 OBJ_LINK_LIST:=$(CRTI_OBJ) $(CRTBEGIN_OBJ) $(filter-out ${CRTI_OBJ} ${CRTN_OBJ},$(OBJS)) $(CRTEND_OBJ) $(CRTN_OBJ)
 
@@ -54,6 +54,18 @@ obj/%.o: src/%.c
 
 obj/%.o: src/%.cc
 	@mkdir -p obj
+	${CXX} -ffreestanding ${CXXFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
+
+obj/sys/%.asm.o: src/sys/%.s
+	@mkdir -p obj/sys
+	${CC} -ffreestanding ${CFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
+
+obj/sys/%.o: src/sys/%.c
+	@mkdir -p obj/sys
+	${CC} -ffreestanding ${CFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
+
+obj/sys/%.o: src/sys/%.cc
+	@mkdir -p obj/sys
 	${CXX} -ffreestanding ${CXXFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
 
 -include obj/*.d
