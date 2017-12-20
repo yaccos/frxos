@@ -45,27 +45,15 @@ frxos.elf: linker.ld $(OBJ_LINK_LIST)
 	$(CC) -ffreestanding -nostdlib -T linker.ld $(OBJ_LINK_LIST) -o $@ -lgcc
 
 obj/%.asm.o: src/%.s
-	@mkdir -p obj
+	@mkdir -p `dirname $@`
 	${CC} -ffreestanding ${CFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
 
 obj/%.o: src/%.c
-	@mkdir -p obj
+	@mkdir -p `dirname $@`
 	${CC} -ffreestanding ${CFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
 
 obj/%.o: src/%.cc
-	@mkdir -p obj
-	${CXX} -ffreestanding ${CXXFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
-
-obj/sys/%.asm.o: src/sys/%.s
-	@mkdir -p obj/sys
-	${CC} -ffreestanding ${CFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
-
-obj/sys/%.o: src/sys/%.c
-	@mkdir -p obj/sys
-	${CC} -ffreestanding ${CFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
-
-obj/sys/%.o: src/sys/%.cc
-	@mkdir -p obj/sys
+	@mkdir -p `dirname $@`
 	${CXX} -ffreestanding ${CXXFLAGS} -MMD -MF $(patsubst %.o,%.d,$@) -c $< -o $@
 
 -include obj/*.d
