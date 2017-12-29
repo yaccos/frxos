@@ -1,24 +1,42 @@
 #ifndef DEBUG_H_
 #define DEBUG_H_
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdarg.h>
+#include <types.h>
 
-#include "idt.h"
+#include <pp/utility.h>
 
-#ifdef __cplusplus
-extern "C" {
+#include "serial.h"
+
+#ifndef __cplusplus
+#error Trying to include C++ header in non-C++ code
 #endif
 
-void dprintf(const char *format, ...);
+namespace frxos {
+  namespace debug {
+    static constexpr port_t PORT = serial::COM1;
 
-#define debug() asm("int $0x7E");
+    static ssize_t print(char ch) {
+      serial::putch(PORT, ch);
+    }
 
-extern void enter_debug_mode(struct full_interrupt_frame *frame);
+    static ssize_t print(const char *str) {
+      serial::print(PORT, str);
+    }
 
-#ifdef __cplusplus
+    template <typename T>
+    static ssize_t print_all(T &&obj) {
+      return print(pp::forward<T>(obj));
+    }
+
+    template <typename T, typename... Ts>
+    static ssize_t print_all(T &&obj, Ts&&... objs) {
+      size_t count = 0;
+      count += print(pp::forward<T>(obj));
+      count += print_all(pp::forward<Ts>(obj)...);
+
+      return count;
+    }
+  }
 }
-#endif
 
 #endif // DEBUG_H_

@@ -1,53 +1,37 @@
 #ifndef SERIAL_H_
 #define SERIAL_H_
 
-#include <stddef.h>
-#include <stdint.h>
+#include <types.h>
 
-#include "io.h"
+#include "port_io.h"
 
-#ifdef __cplusplus
-extern "C" {
+#ifndef __cplusplus
+#error Trying to include C++ header in non-C++ code
 #endif
 
-#define COM1 0x3F8
-#define COM2 0x2F8
-#define COM3 0x3E8
-#define COM4 0x2E8
+namespace frxos {
+  namespace serial {
+    static constexpr port_t COM1 = 0x03F8;
+    static constexpr port_t COM2 = 0x02F8;
+    static constexpr port_t COM3 = 0x02E8;
+    static constexpr port_t COM4 = 0x02E8;
 
-void install_serial(uint16_t port);
+    void install(port_t port);
+    
+    static void install_all() {
+      install(COM1);
+      install(COM2);
+      install(COM3);
+      install(COM4);
+    }
 
-static inline uint8_t serial_received(uint16_t port) {
-  return inb(port + 5) & 1;
+    void putch(port_t port, uint8_t ch);
+    uint8_t getch(port_t port);
+
+    ssize_t write(port_t port, const void *buf, size_t size);
+    ssize_t read(port_t port, void *buf, size_t size);
+    ssize_t print(port_t port, const char *str);
+  }
 }
-
-static inline uint8_t serial_getch(uint16_t port) {
-  while(serial_received(port) == 0);
-  return inb(port);
-}
-
-static inline uint8_t serial_is_transmit_empty(uint16_t port) {
-  return inb(port + 5) & 0x20;
-}
-
-static inline void serial_putch(uint16_t port, uint8_t ch) {
-  while(serial_is_transmit_empty(port) == 0);
-  outb(port, ch);
-}
-
-static inline void serial_write(uint16_t port, void *data, uint32_t size) {
-  char *cdata = (char*)data;
-  for(uint32_t i = 0; i < size; i++)
-    serial_putch(port, (uint8_t)cdata[i]);
-}
-
-static inline void serial_print(uint16_t port, const char *str) {
-  for(const char *p = str; *p; p++)
-    serial_putch(port, (uint8_t)*p);
-}
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // SERIAL_H_

@@ -1,34 +1,40 @@
-#ifndef TIMER_H_
-#define TIMER_H_
+#ifndef TIME_H_
+#define TIME_H_
 
-#include <stddef.h>
-#include <stdint.h>
+#include <types.h>
 
-#ifdef __cplusplus
-extern "C" {
+#ifndef __cplusplus
+#error Trying to include C++ header in non-C++ code
 #endif
 
-#define TICKS_PER_SEC 1193182      // base frequency, in Hz
+namespace frxos {
+  namespace timer {
+    void install();
 
-void install_timer();
-void set_timer_divider(uint16_t divider);
-uint64_t clock();
+    namespace impl {
+      static inline void wait() {
+        asm volatile("hlt");
+      }
 
-// sleep CPU for a while
-void sleep(uint64_t sec);   // sleep for a whole number of seconds
-void usleep(uint64_t usec); // sleep for a whole number of microseconds
+      static inline void wait_forever() {
+        asm volatile("hlt");
+      }
 
-// short CPU sleep
-#define wait() ({ asm volatile("hlt"); 0; })
-
-// CPU sleep forever
-#define wait_forever() ({ for(;;) { asm volatile("hlt")); }; 1; })
-
-// CPU sleep until condition is true
-#define wait_for(expr) ({ typeof(expr) __expr; while(!(__expr = expr)) { asm volatile("hlt"); }; __expr; })
-
-#ifdef __cplusplus
+      template <typename Fn>
+      static inline auto wait_for(Fn &&func) -> decltype(func()) {
+        auto __expr = func();
+        while(!__expr) {
+          asm volatile("hlt");
+          __expr = func();
+        }
+        return __expr;
+      }
+    }
+  }
 }
-#endif
 
-#endif // TIMER_H_
+#define WAIT() ::frxos::timer::impl::wait()
+#define WAIT_FOREVER() ::frxos::timer::impl::wait_forever()
+#define WAIT_FOR(expr) ::frxos::timer::impl::wait_for([&] () { return (expr); })
+
+#endif // TIME_H_
