@@ -42,12 +42,12 @@ uint64_t clock() {
 
 void sleep(uint64_t sec) {
   const uint64_t start_time = clock_ticks;
-  const uint64_t end_time = TICKS_PER_SEC * sec;
+  const uint64_t end_time = start_time +  TICKS_PER_SEC * sec;
   wait_for(clock_ticks >= end_time);
 }
 
 void usleep(uint64_t usec) {
   const uint64_t start_time = clock_ticks;
-  const uint64_t end_time = (TICKS_PER_SEC / 1000) * usec / 1000;
+  const uint64_t end_time = start_time + (TICKS_PER_SEC / 1000) * usec / 1000;
   wait_for(clock_ticks >= end_time);
 }
