@@ -120,3 +120,14 @@ uint16_t pic_get_irr(void) {
 uint16_t pic_get_isr(void) {
   return __pic_get_irq_reg(PIC_READ_ISR);
 }
+
+__always_inline
+inline void irq_disable(){
+	asm volatile("cli");
+}
+
+__always_inline
+inline void irq_enable(){
+	asm volatile("sti");
+}
+

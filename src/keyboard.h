@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 void install_keyboard();
-
+uint8_t keystroke_pop();
 #ifdef __cplusplus
 }
 #endif

@@ -14,7 +14,8 @@ extern "C" {
 #define PIC2_PORT 0x28
 
 void install_irq();
-
+void irq_disable();
+void irq_enable();
 void set_irq_handler(uint8_t num, void (*func)(struct full_interrupt_frame*));
 void set_irq_return(void(*func)(struct full_interrupt_frame*));
 

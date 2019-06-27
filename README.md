@@ -17,10 +17,11 @@
 
 ## Build
 
-To build, ensure that you have an `i686-elf` toolchain installed ([precompiled binaries available here][1]) and `make`.
+To build, ensure that you have an `i686-elf` toolchain installed ([precompiled binaries available here][1]), the [`GRUB` bootloader][2] and `make`.
 
 To build, run `make all`.
 
 To run locally with QEMU, run `run.sh` (requires qemu-system-i386 in `PATH`) or run `qemu-system-i386 -kernel frxos.elf`.
 
 [1]: https://github.com/lordmilko/i686-elf-tools/releases
+[2]: https://www.gnu.org/software/grub/
