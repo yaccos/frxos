@@ -21,7 +21,9 @@ static void key_handler(struct full_interrupt_frame *frame) {
   bool pressed = (scancode & 0x80) == 0;
 
   // If a key is pressed and we are reading keystrokes, put it to the buffer
-  if(pressed && reading_key){
+  // Also, we protect against buffer overflows by discarding keystorkes when
+  // the buffer is full
+  if(pressed && reading_key && n_keystrokes_stored != MAX_PRESSED_KEYSTROKES){
 	dprintf("Processing scancode ...\n");
   	pressed_keystrokes[n_keystrokes_stored++] = scancode;
   }

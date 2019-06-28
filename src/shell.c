@@ -22,8 +22,7 @@ void shell() {
   vga_printf(4,0,color,"Press PAUSE or SPACE to enter debug mode, press ENTER to quit the OS\n");
   vga_printf(6,0,color,"For the moment, the OS cannot do much more than this :-)\n");
   while(1){
-  	uint8_t key = keystroke_pop();
-	dprintf("Key: %2X \n",key);
+  	uint8_t key;
 	// Wait until we obtain a valid keystroke
   	do{
   		key = keystroke_pop();
